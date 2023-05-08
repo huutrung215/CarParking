@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html xmlns:th="https://www.thymeleaf.org/">
+
+<style>
+h4{
+    margin-left: 6%;
+}
+
+.seat-main {
+	/* border: 2px solid black; */
+	padding: 40px 3px 40px 20px;
+	margin-top: -35px;
+}
+
+.area {
+	display: grid;
+    grid-template-columns: auto auto auto auto auto;
+}
+
+a[data-status="AVAILABLE"] {
+	padding: 8px 18px;
+	margin: 5px;
+	background-color: #1cc88a;
+	border-color: #1cc88a;
+}
+
+ a[data-status="BOOKED"] {
+	padding: 8px 18px;
+	margin: 5px;
+	background-color: #f6c23e;
+	border-color: #f6c23e;
+}
+
+a[data-status="OCCUPIED"] {
+	padding: 8px 18px;
+	margin: 5px;
+	background-color: #ff0000;
+	border-color: #ff0000;
+} 
+
+a[data-condition="INACTIVE"] {
+	padding: 8px 18px;
+	margin: 5px;
+	background-color: #343541;
+	border-color: #343541;
+} 
+
+a[data-status="OCCUPIED"]:hover,
+a[data-status="BOOKED"]:hover,
+a[data-status="INACTIVE"]:hover {
+  pointer-events: none;
+  cursor: default;
+}
+
+
+.col-8 .date_form {
+	margin-top: 20px;
+}
+
+.seat-main .date_form form input[type="date"]::-webkit-clear-button {
+    display: none;
+    -webkit-appearance: none;
+}
+
+
+.seat-section .seat-row .col-5 {
+	/* border: 2px solid black; */
+	margin: 5px;
+	padding: 10px 10px;
+}
+
+.seat-section .seat-row .col-5:nth-child(1) {
+	margin-left: 35px
+}
+
+.seat-section .seat-row {
+	margin-top: 30px;
+	/* border: 2px solid black; */
+}
+
+.btn1 {
+	margin-left: 45px;
+	/* margin-top: -210px; */
+}
+
+.seat-section .symbol .one {
+	font-size: 25px;
+	color: red;
+}
+
+.seat-section .symbol {
+	margin-top: 45px;
+    margin-bottom: 15px;
+    float: right;
+    margin-right:-30%;
+}
+
+.seat-section .symbol .two {
+	font-size: 25px;
+	margin-left: 10px;
+	color: green;
+}
+
+.seat-section .symbol .three {
+	font-size: 25px;
+	margin-left: 10px;
+	color: #f6c23e;
+}
+
+.seat-section .symbol .four {
+	font-size: 25px;
+	margin-left: 10px;
+	color: #343541;
+}
+
+.symbol {
+  display: flex;
+  flex-direction: column;
+}
+
+.symbol i, .symbol span {
+  margin: -1px 0;
+}
+
+</style>
+<head th:replace="fragments :: header"></head>
+<body id="page-top">
+<!-- Page Wrapper -->
+<div id="wrapper">
+    <!-- Sidebar -->
+    <ul th:replace="fragments :: sidebar">
+    </ul>
+    <!-- End of Sidebar -->
+
+    <!-- Content Wrapper -->
+    <div id="content-wrapper" class="d-flex flex-column">
+
+        <!-- Main Content -->
+        <div id="content">
+
+            <!-- Topbar -->
+            <nav th:replace="fragments :: topbar"></nav>
+            <!-- End of Topbar -->
+
+            <!-- Begin Page Content -->
+            <div class="container-fluid">
+            	<h4>Xem vị trí</h4>
+            	<div class="col-9 seat-main">
+            	
+            		<form action="book-seat" method="post">
+					<div class="container seat-section">
+					<div class="symbol">
+						<i class="fas fa-square one"></i>&nbsp;<span>Already Booked</span>&nbsp;&nbsp;&nbsp;&nbsp;
+						<i class="fas fa-square two"></i>&nbsp;<span>Position Available</span>&nbsp;&nbsp;&nbsp;&nbsp;
+						<i class="fas fa-square three"></i>&nbsp;<span>Confirmation</span>&nbsp;&nbsp;&nbsp;&nbsp;
+						<i class="fas fa-square four"></i>&nbsp;<span>Inactive</span>
+					</div>
+						<div class="row seat-row">
+						   <div class="col-6 first">
+						   	<h6>Khu vực 1</h6> 
+						   	<div class="area">
+						   		<div th:each="position, iterStat : ${positions}" th:if="${iterStat.index} &lt; ${#lists.size(positions)/2}">
+					   				<a class="btn btn-success" 
+					   				name="positionIds" th:value="${position.id}"  th:data-condition="${position.condition}" th:data-status="${position.status}">
+									    <span th:text="${position.positionName}"></span>
+									</a>
+								</div>
+						   	</div>
+						   </div>
+						    <div class="col-6 second">
+						    <h6>Khu vực 2</h6>   
+						    	<div class="area">
+						    		<div th:each="position, iterStat : ${positions}" th:if="${iterStat.index} &gt;= ${#lists.size(positions)/2}">
+						    			<a class="btn btn-success" name="positionIds" th:value="${position.id}" th:data-condition="${position.condition}" th:data-status="${position.status}">
+										    <span th:text="${position.positionName}"></span>
+										</a>
+						    		</div>	
+						    	</div>    
+						    </div>
+						</div>
+					</div>
+				</form>
+            	
+            	</div>
+            </div>
+            <!-- /.container-fluid -->
+
+        </div>
+        <!-- End of Main Content -->
+
+        <!-- Footer -->
+        <footer th:replace="fragments :: footer">
+        </footer>
+        <!-- End of Footer -->
+
+    </div>
+    <!-- End of Content Wrapper -->
+
+</div>
+<!-- End of Page Wrapper -->
+
+<!-- Scroll to Top Button-->
+<a th:replace="fragments :: scroll">
+</a>
+
+<!-- Logout Modal-->
+  <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-aledby="exampleModala"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModala">Ready to Leave?</h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-a="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                    <a class="btn btn-primary" href="/logout">Logout</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+  <!-- Bootstrap core JavaScript-->
+    <script src="vendor/jquery/jquery.min.js"></script>
+    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Core plugin JavaScript-->
+    <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+
+    <!-- Custom scripts name all pages-->
+    <script src="js/sb-admin-2.min.js"></script>
+
+
+</body>
+
+</html>

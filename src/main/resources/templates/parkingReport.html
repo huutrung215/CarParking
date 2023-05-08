@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head th:replace="fragments :: header">
+</head>
+
+<body id="page-top">
+
+<!-- jQuery library -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Bootstrap JavaScript -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+    <!-- Page Wrapper -->
+    <div id="wrapper">
+
+        <!-- Sidebar -->
+         <ul th:replace="fragments :: sidebar"></ul>
+        <!-- End of Sidebar -->
+
+        <!-- Content Wrapper -->
+        <div id="content-wrapper" class="d-flex flex-column">
+
+            <!-- Main Content -->
+            <div id="content">
+
+                <!-- Topbar -->
+              <nav th:replace="fragments :: topbar"></nav>
+              <!-- End of Topbar -->
+
+                <!-- Begin Page Content -->
+                <div class="container-fluid">
+
+                    <!-- Page Heading -->
+                    <h1 class="h3 mb-2 text-gray-800">Thống kê bãi đỗ</h1>
+					 
+					  <form th:action="@{/ParkingReport/search}" method="get">
+					  <div class="row">
+						  	<div class="col-md-4 mb-2">
+						    <div class="card-body">
+						      <label for="">Từ ngày</label>
+						      <input type="text" name="from" class="form-control flatpickr">
+						    </div>
+						  </div>  
+						  <div class="col-md-4 mb-2">
+						    <div class="card-body">
+						      <label for="">Đến ngày</label>
+						      <input type="text" name="to" class="form-control flatpickr1">
+						    </div>
+						  </div>
+						  <div class="col-md-4 mb-2">
+						    <div class="card-body" style="padding-top: 13%">
+						      <button class="btn btn-primary" type="submit">Xem</button>
+						    </div>
+						  </div>
+						  </div>
+					  </form>
+					
+                    <!-- DataTales Example -->
+                    <div class="card shadow mb-4">
+                        
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                                    <thead>
+                                        <tr>
+                                            <th>STT</th>
+                                            <th>Parking Name</th>
+                                            <th>Họ tên</th>
+                                            <th>Số thẻ tháng</th>
+                                            <th>Vị trí đỗ</th>
+                                            <th>Biển số xe</th>
+                                            <th>Chi tiết xe</th>
+                                            <th>Check in</th>
+                                            <th>Check out</th>
+                                            <th>Gía Tiền</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr th:each="parking, index : ${parkings}">
+                                        	<td th:text="${index.count}"></td>
+                                        	<td th:text="${parking.parkingName}"></td>
+                                            <td th:text="${parking.monthlyTicket != null ? parking.monthlyTicket.getUser().getFullName() : ''}"></td>
+                                            <td th:text="${parking.monthlyTicket != null ? parking.monthlyTicket.getTicketId() : ''}"></td>                                      
+                                            <td th:text="${parking.position.getPositionName()}"></td>
+                                            <td th:text="${parking.car.getNumberPlates()}"></td>
+                                            <td><a th:href="@{'/Parking/car/'+${parking.car.getCarId()}}" class="btn btn-primary">Xem</a></td>
+                                            <td th:text="${parking.checkIn}"></td>
+                                            <td th:text="${parking.checkOut}"></td>
+                                        	<td th:text="${parking.parkingPrice}"></td>
+                                        </tr>
+                                    </tbody>
+                                    <tfoot>
+					                    <tr>
+					                        <th colspan="5" class="text-right">Tổng cộng:</th>
+					                        <th class="text-right" th:text="${totalPrice}"></th>
+					                        <th></th>
+					                    </tr>
+					                </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <!-- /.container-fluid -->
+
+            </div>
+            <!-- End of Main Content -->
+
+            <!-- Footer -->
+            <footer class="sticky-footer bg-white">
+                <div class="container my-auto">
+                    <div class="copyright text-center my-auto">
+                        <span>Copyright &copy; Your Website 2020</span>
+                    </div>
+                </div>
+            </footer>
+            <!-- End of Footer -->
+
+        </div>
+        <!-- End of Content Wrapper -->
+
+    </div>
+    <!-- End of Page Wrapper -->
+
+    <!-- Scroll to Top Button-->
+    <a class="scroll-to-top rounded" href="#page-top">
+        <i class="fas fa-angle-up"></i>
+    </a>
+
+    <!-- Logout Modal-->
+    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-aledby="exampleModala"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModala">Ready to Leave?</h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-a="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                    <a class="btn btn-primary" href="login.html">Logout</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+   	 flatpickr(".flatpickr", {
+   	  enableTime: true,
+   	  noCalendar: false,
+   	  dateFormat: "Y-m-d H:i:S", });
+   	 
+   	flatpickr(".flatpickr1" , {
+     	  enableTime: true,
+       	  noCalendar: false,
+       	  dateFormat: "Y-m-d H:i:S", });
+	</script>
+	
+
+    <!-- Bootstrap core JavaScript-->
+    <script src="vendor/jquery/jquery.min.js"></script>
+    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Core plugin JavaScript-->
+    <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+
+    <!-- Custom scripts name all pages-->
+    <script src="js/sb-admin-2.min.js"></script>
+
+    <!-- Page level plugins -->
+    <script src="vendor/datatables/jquery.dataTables.min.js"></script>
+    <script src="vendor/datatables/dataTables.bootstrap4.min.js"></script>
+
+    <!-- Page level custom scripts -->
+    <script src="js/demo/datatables-demo.js"></script>
+</body>
+
+</html>
