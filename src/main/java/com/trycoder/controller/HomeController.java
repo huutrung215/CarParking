@@ -28,13 +28,16 @@ import com.trycoder.dto.ParkingDto;
 import com.trycoder.dto.PositionDto;
 import com.trycoder.model.Car;
 import com.trycoder.model.Parking;
+import com.trycoder.model.ParkingPrice;
 import com.trycoder.model.Position;
 import com.trycoder.model.PositionCondition;
 import com.trycoder.model.PositionStatus;
 import com.trycoder.model.UserDtls;
+import com.trycoder.repository.ParkingPriceRepository;
 import com.trycoder.repository.PositionRepository;
 import com.trycoder.repository.UserRepository;
 import com.trycoder.service.CarService;
+import com.trycoder.service.ParkingPriceService;
 import com.trycoder.service.ParkingService;
 import com.trycoder.service.PositionService;
 import com.trycoder.service.UserService;
@@ -61,6 +64,13 @@ public class HomeController {
 	
 	@Autowired
 	CarService carService;
+	
+	@Autowired
+    private ParkingPriceRepository parkingPriceRepo;
+	
+	@Autowired
+	ParkingPriceService parkingPriceService;
+	
 	
 	// Trang index
 	@GetMapping("/")
@@ -161,6 +171,32 @@ public class HomeController {
         return "redirect:/Position/add";
     }
     
+    // Update Parking Price
+    @GetMapping("/ParkingPrice/edit")
+    public String showParkingPrice(Model model) {
+    	try {
+    		ParkingPrice parkingPrice = parkingPriceService.getParkingPriceById(1);
+            model.addAttribute("parkingPrice", parkingPrice);
+            return "ParkingPrice";
+    	} catch (ConfigDataResourceNotFoundException ex) {
+            return "redirect:/index";
+        }
+    }
+    
+    @PostMapping("/UpdateParkingPrice/1")
+    public String updateParkingPrice(@ModelAttribute("parkingPrice") ParkingPrice newParkingPrice,
+	        BindingResult result, RedirectAttributes ra) {
+    	if (result.hasErrors()) {
+            return "index";
+        }   	
+    	 try {
+    		 ParkingPrice updatedPrice = parkingPriceService.updateParkingPrice(1, newParkingPrice);
+	        ra.addFlashAttribute("msg", "giá cập nhật thành công");
+	    } catch (ConfigDataResourceNotFoundException ex) {
+	    }
+        return "redirect:/ParkingPrice/edit";
+    }
+    
     // trang sửa chỗ đỗ xe
     @GetMapping("/Position/edit/{id}")
     public String showEditPositionForm(@PathVariable("id") Long id, Model model) {
@@ -245,16 +281,16 @@ public class HomeController {
     // controller tìm parking
     @GetMapping("/ParkingReport/search")
     public String parkingReportSearch(@RequestParam("from") @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime from,
-            @RequestParam("to") @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime to, Model model) {
-			List<Parking> parkings = parkingService.findParkingsBetween(from, to);
-			model.addAttribute("pageTitle", "Bảng người dùng đang đỗ xe");
-			List<ParkingDto> parkingDto = convertParkingsToParkingDto(parkings, model);
-			model.addAttribute("parkings", parkingDto);
-		
-		    System.out.println("danh sach "+ parkings + "khong tháy gi");
+        @RequestParam("to") @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime to, Model model) {
+		List<Parking> parkings = parkingService.findParkingsBetween(from, to);
+		model.addAttribute("pageTitle", "Bảng người dùng đang đỗ xe");
+		List<ParkingDto> parkingDto = convertParkingsToParkingDto(parkings, model);
+		model.addAttribute("parkings", parkingDto);
+	
+	    System.out.println("danh sach "+ parkings + "khong tháy gi");
 
-			return "parkingReport";
-		}
+		return "parkingReport";
+	}
 	
     // controller hiển thị parking
     @GetMapping("/ParkingReport")

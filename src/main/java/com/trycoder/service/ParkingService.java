@@ -3,6 +3,7 @@ package com.trycoder.service;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.ArrayList;
 
 
@@ -10,8 +11,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.trycoder.model.Parking;
+import com.trycoder.model.ParkingPrice;
 import com.trycoder.model.Position;
 import com.trycoder.model.PositionStatus;
+import com.trycoder.repository.ParkingPriceRepository;
 import com.trycoder.repository.ParkingRepository;
 import com.trycoder.repository.PositionRepository;
 
@@ -19,11 +22,16 @@ import jakarta.persistence.EntityNotFoundException;
 
 @Service
 public class ParkingService {
+	
 	@Autowired
 	private ParkingRepository parkingRepo;
 	
-	public ParkingService(ParkingRepository parkingRepo) {
-        this.parkingRepo = parkingRepo;
+	@Autowired
+	private static ParkingPriceRepository parkingPriceRepo;
+    
+    public ParkingService(ParkingRepository parkingRepo, ParkingPriceRepository parkingPriceRepo) {
+        this.parkingPriceRepo = parkingPriceRepo;
+		this.parkingRepo = parkingRepo;
     }
 	
 	public List<Parking> getAllParkings() {
@@ -31,28 +39,44 @@ public class ParkingService {
 	}
 	
 	
+	public static Long getPriceDay(int id) {
+	    ParkingPrice parkingPrice = parkingPriceRepo.findById(id).orElseThrow(() -> new EntityNotFoundException("Không tìm thấy Id: " + id));
+        return parkingPrice.getPriceDay();
+	
+	}
+	
+	public static Long getPriceNight(int id) {
+	    ParkingPrice parkingPrice = parkingPriceRepo.findById(id).orElseThrow(() -> new EntityNotFoundException("Không tìm thấy id: " + id));
+	    return parkingPrice.getPriceNight();
+	}
+	
+
 	public static Long calculateParkingPrice(LocalDateTime checkIn, LocalDateTime checkOut) {
 	    if (checkIn.isAfter(checkOut)) {
 	        throw new IllegalArgumentException("End date time must be after start date time");
 	    }
+	   
+        Long fee1 = getPriceDay(1);
+        Long fee2 = getPriceNight(1);
+        
 	    Long price = (long) 0;
 	    LocalDateTime currentDateTime = checkIn;
 	    while (currentDateTime.isBefore(checkOut)) {
 	        int hourOfDay = currentDateTime.getHour();
 	        if (hourOfDay >= 22 || hourOfDay < 5) { // qua đêm từ 22h đến 5h sáng hôm sau
-	            price += 120000;
+	            price += fee1;
 	            currentDateTime = currentDateTime.plusDays(1).withHour(5).withMinute(0).withSecond(0).withNano(0);
 	        } else if (Duration.between(currentDateTime, checkOut).toHours() <= 2) {
-                price += 15000;
+                price += fee2;
                 currentDateTime = currentDateTime.plusHours(1);
             } else if (Duration.between(currentDateTime, checkOut).toHours() <= 4) {
-                price += 20000;
+                price += (fee2 + 5000);
                 currentDateTime = currentDateTime.plusHours(1);
             } else if (Duration.between(currentDateTime, checkOut).toHours() <= 6) {
-                price += 25000;
+                price += (fee2 + 10000);
                 currentDateTime = currentDateTime.plusHours(1);
             } else {
-                price += 50000;
+                price += (fee2 + 35000);
                 currentDateTime = currentDateTime.plusHours(1);
             }
 	    }
@@ -62,6 +86,11 @@ public class ParkingService {
 	
 	 public Parking getParkingById(Long id) {
 	        return parkingRepo.findById(id)
+	                .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy parkingId " + id));
+	 }
+	 
+	 public ParkingPrice getParkingPriceById(int id) {
+	        return parkingPriceRepo.findById(id)
 	                .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy parkingId " + id));
 	 }
 	 
