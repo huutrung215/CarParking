@@ -27,6 +27,7 @@ public class ParkingPriceService {
 		ParkingPrice parkingPrice = getParkingPriceById(id);
 		parkingPrice.setPriceDay(newParkingPrice.getPriceDay());
 		parkingPrice.setPriceNight(newParkingPrice.getPriceNight());
+		parkingPrice.setPriceMonth(newParkingPrice.getPriceMonth());
 		return parkingPriceRepo.save(parkingPrice);
 	}
 }

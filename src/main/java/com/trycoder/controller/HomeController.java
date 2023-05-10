@@ -1,6 +1,7 @@
 package com.trycoder.controller;
 
 import java.security.Principal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.ArrayList;
@@ -24,9 +25,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.trycoder.dto.MonthlyTicketDto;
 import com.trycoder.dto.ParkingDto;
 import com.trycoder.dto.PositionDto;
 import com.trycoder.model.Car;
+import com.trycoder.model.MonthlyTicket;
 import com.trycoder.model.Parking;
 import com.trycoder.model.ParkingPrice;
 import com.trycoder.model.Position;
@@ -40,6 +43,7 @@ import com.trycoder.service.CarService;
 import com.trycoder.service.ParkingPriceService;
 import com.trycoder.service.ParkingService;
 import com.trycoder.service.PositionService;
+import com.trycoder.service.MonthlyTicketService;
 import com.trycoder.service.UserService;
 import org.springframework.web.server.*;
 import jakarta.servlet.http.HttpSession;
@@ -71,6 +75,9 @@ public class HomeController {
 	@Autowired
 	ParkingPriceService parkingPriceService;
 	
+	@Autowired
+	MonthlyTicketService monthlyTicketService;
+	
 	
 	// Trang index
 	@GetMapping("/")
@@ -80,6 +87,12 @@ public class HomeController {
 		
 		long countNewUser = userRepo.countByRoleAndCreatedUserBetween("ROLE_USER", LocalDateTime.now().minusWeeks(1), LocalDateTime.now());
 		model.addAttribute("countNewUser", countNewUser);
+		
+		long totalLastMonth = parkingService.calParkingPriceNotMonTickLastMonth() + monthlyTicketService.calMonthlyTicketPriceFromLastMonth();
+		model.addAttribute("totalLastMonth", totalLastMonth);
+		
+		long totalOfDay = parkingService.calParkingPriceNotMonTickDay();
+		model.addAttribute("totalOfDay", totalOfDay);
 		
 		return "index";
 	}
@@ -131,6 +144,32 @@ public class HomeController {
 	    return "redirect:/Parking";
 	}
 	
+	 // Update Parking Price
+    @GetMapping("/ParkingPrice/edit")
+    public String showParkingPrice(Model model) {
+    	try {
+    		ParkingPrice parkingPrice = parkingPriceService.getParkingPriceById(1);
+            model.addAttribute("parkingPrice", parkingPrice);
+            return "ParkingPrice";
+    	} catch (ConfigDataResourceNotFoundException ex) {
+            return "redirect:/index";
+        }
+    }
+    
+    @PostMapping("/UpdateParkingPrice/1")
+    public String updateParkingPrice(@ModelAttribute("parkingPrice") ParkingPrice newParkingPrice,
+	        BindingResult result, RedirectAttributes ra) {
+    	if (result.hasErrors()) {
+            return "index";
+        }   	
+    	 try {
+    		 ParkingPrice updatedPrice = parkingPriceService.updateParkingPrice(1, newParkingPrice);
+	        ra.addFlashAttribute("msg", "giá cập nhật thành công");
+	    } catch (ConfigDataResourceNotFoundException ex) {
+	    }
+        return "redirect:/ParkingPrice/edit";
+    }
+	
 	// bảng chỗ đỗ xe
 	@GetMapping("/PositionTable")
 	public String positionTable(Model model) {
@@ -171,31 +210,6 @@ public class HomeController {
         return "redirect:/Position/add";
     }
     
-    // Update Parking Price
-    @GetMapping("/ParkingPrice/edit")
-    public String showParkingPrice(Model model) {
-    	try {
-    		ParkingPrice parkingPrice = parkingPriceService.getParkingPriceById(1);
-            model.addAttribute("parkingPrice", parkingPrice);
-            return "ParkingPrice";
-    	} catch (ConfigDataResourceNotFoundException ex) {
-            return "redirect:/index";
-        }
-    }
-    
-    @PostMapping("/UpdateParkingPrice/1")
-    public String updateParkingPrice(@ModelAttribute("parkingPrice") ParkingPrice newParkingPrice,
-	        BindingResult result, RedirectAttributes ra) {
-    	if (result.hasErrors()) {
-            return "index";
-        }   	
-    	 try {
-    		 ParkingPrice updatedPrice = parkingPriceService.updateParkingPrice(1, newParkingPrice);
-	        ra.addFlashAttribute("msg", "giá cập nhật thành công");
-	    } catch (ConfigDataResourceNotFoundException ex) {
-	    }
-        return "redirect:/ParkingPrice/edit";
-    }
     
     // trang sửa chỗ đỗ xe
     @GetMapping("/Position/edit/{id}")
@@ -267,7 +281,9 @@ public class HomeController {
             
             Long price = ParkingService.calculateParkingPrice(parking.getCheckIn(), parking.getCheckOut());
             parkingModel.setParkingPrice(price);
-            totalPrice += price;
+            if (parking.getMonthlyTicket() == null) {
+                totalPrice += price;
+            }
             
             parkingModel.setPosition(parking.getPosition());
             parkingModel.setMonthlyTicket(parking.getMonthlyTicket());
@@ -309,12 +325,33 @@ public class HomeController {
         	Car carId = carService.getCarById(id);
             model.addAttribute("carId", carId);
             model.addAttribute("pageTitle", "Xem thông tin xe");
-            return "carsDetail";
+            return "redirect:/carsDetail";
         } catch (ConfigDataResourceNotFoundException ex) {
             // Handle exception if position is not found
             return "redirect:/parkingReport";
         } 
 	}
+	
+	@GetMapping("/MonthlyParkingTable")
+	public String monParkingMana(Model model) {
+		List<MonthlyTicket> monthlyTickets = monthlyTicketService.getMonthlyTicketAvailable();
+		model.addAttribute("pageTitle", "Bảng người dùng đăng ký thẻ tháng");
+		List<MonthlyTicketDto> monthlyTicketDto = new ArrayList<>();
+		ParkingPrice parkingPrice = new ParkingPrice();
+		for (MonthlyTicket monthlyTicket : monthlyTickets) {
+			MonthlyTicketDto monTicketModel = new MonthlyTicketDto();
+			monTicketModel.setTicketId(monthlyTicket.getTicketId());
+			monTicketModel.setStartDate(monthlyTicket.getStartDate());
+			monTicketModel.setEndDate(monthlyTicket.getEndDate());			
+			monTicketModel.setPrice(parkingPrice.getPriceMonth());
+			monTicketModel.setUser(monthlyTicket.getUser());
+			monthlyTicketDto.add(monTicketModel);
+		}
+		model.addAttribute("monthlyTickets", monthlyTicketDto);
+		return "monParkingMana";
+	}
+	
+	
 	
 	@GetMapping("/ChangePassword")
 	public String ChangePassword() {

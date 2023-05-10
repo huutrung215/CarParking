@@ -23,6 +23,7 @@ public class MonthlyTicket {
     private LocalDateTime startDate;
 	@Column(nullable = false)
     private LocalDateTime endDate;
+	private Long price;
     
     // các trường khác nếu cần thiết
     
@@ -75,5 +76,13 @@ public class MonthlyTicket {
 
 	public void setUser(UserDtls user) {
 		this.user = user;
+	}
+
+	public Long getPrice() {
+		return price;
+	}
+
+	public void setPrice(Long price) {
+		this.price = price;
 	}
 }

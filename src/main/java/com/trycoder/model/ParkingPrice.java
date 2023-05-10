@@ -16,6 +16,7 @@ public class ParkingPrice {
 	private int id;
 	private Long priceDay;
 	private Long priceNight;
+	private Long priceMonth;
 	public int getId() {
 		return id;
 	}
@@ -33,6 +34,12 @@ public class ParkingPrice {
 	}
 	public void setPriceNight(Long priceNight) {
 		this.priceNight = priceNight;
+	}
+	public Long getPriceMonth() {
+		return priceMonth;
+	}
+	public void setPriceMonth(Long priceMonth) {
+		this.priceMonth = priceMonth;
 	}
 	
 }

@@ -1,9 +1,11 @@
 package com.trycoder.service;
 
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.YearMonth;
 import java.util.List;
-import java.util.Optional;
 import java.util.ArrayList;
 
 
@@ -56,8 +58,8 @@ public class ParkingService {
 	        throw new IllegalArgumentException("End date time must be after start date time");
 	    }
 	   
-        Long fee1 = getPriceDay(1);
-        Long fee2 = getPriceNight(1);
+        Long fee2 = getPriceDay(1);
+        Long fee1 = getPriceNight(1);
         
 	    Long price = (long) 0;
 	    LocalDateTime currentDateTime = checkIn;
@@ -124,5 +126,36 @@ public class ParkingService {
 	 
 	 public List<Parking> getAllParkingsWithNotNullCheckOut() {
 		return parkingRepo.findByCheckOutIsNotNull();	 
+	 }
+	 
+	 public Long calParkingPriceNotMonTickDay() {
+		 LocalDateTime startOfDay = LocalDateTime.now().with(LocalTime.MIN);
+	    LocalDateTime now = LocalDateTime.now();
+	    List<Parking> parkings = parkingRepo.findByMonthlyTicketIsNull();
+	    Long totalPrice = 0L;
+
+	    for (Parking parking : parkings) {
+	        if (parking.getCheckOut() != null && 
+	        	parking.getCheckOut().isAfter(startOfDay) && parking.getCheckOut().isAfter(now)) {
+	            totalPrice += parking.getParkingPrice();
+	        }
+	    }
+	    return totalPrice;
+	 }
+	 
+	 public Long calParkingPriceNotMonTickLastMonth() {
+		 LocalDateTime currentTime = LocalDateTime.now();
+	    YearMonth lastMonth = YearMonth.from(currentTime.minusMonths(1));
+	    LocalDateTime firstDayOfMonth = lastMonth.atDay(1).atStartOfDay();
+	    LocalDateTime lastDayOfMonth = lastMonth.atEndOfMonth().atTime(23, 59, 59);
+	    List<Parking> parkings = parkingRepo.findByMonthlyTicketIsNull();
+	    Long totalPrice = 0L;
+	    for (Parking parking : parkings) {
+	    	if (parking.getCheckOut() != null && parking.getCheckOut().isAfter(firstDayOfMonth) 
+	    			&& parking.getCheckOut().isBefore(lastDayOfMonth)) {
+	    		totalPrice += parking.getParkingPrice();
+	    	}
+	    }
+		return totalPrice;
 	 }
 }
