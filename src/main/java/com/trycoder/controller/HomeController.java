@@ -3,6 +3,7 @@ package com.trycoder.controller;
 import java.security.Principal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -77,7 +78,6 @@ public class HomeController {
 	
 	@Autowired
 	MonthlyTicketService monthlyTicketService;
-	
 	
 	// Trang index
 	@GetMapping("/")
@@ -295,28 +295,24 @@ public class HomeController {
     }
     
     // controller tìm parking
-    @GetMapping("/ParkingReport/search")
-    public String parkingReportSearch(@RequestParam("from") @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime from,
-        @RequestParam("to") @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime to, Model model) {
-		List<Parking> parkings = parkingService.findParkingsBetween(from, to);
-		model.addAttribute("pageTitle", "Bảng người dùng đang đỗ xe");
-		List<ParkingDto> parkingDto = convertParkingsToParkingDto(parkings, model);
-		model.addAttribute("parkings", parkingDto);
-	
-	    System.out.println("danh sach "+ parkings + "khong tháy gi");
-
-		return "parkingReport";
-	}
-	
-    // controller hiển thị parking
     @GetMapping("/ParkingReport")
-	public String parkingReport(Model model) {
-		List<Parking> parkings = parkingService.getAllParkingsWithNotNullCheckOut();
-		model.addAttribute("pageTitle", "Bảng người dùng đã đỗ xe");
-		List<ParkingDto> parkingDto = convertParkingsToParkingDto(parkings, model);
-		model.addAttribute("parkings", parkingDto);
-		return "parkingReport";
-	}
+    public String parkingReport(@RequestParam(required = false) String from, @RequestParam(required = false) String to, Model model) {
+        if (from != null && to != null) {
+            LocalDateTime fromDate = LocalDateTime.parse(from, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+            LocalDateTime toDate = LocalDateTime.parse(to, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+            List<Parking> parkings = parkingService.findParkingsBetween(fromDate, toDate);
+            model.addAttribute("pageTitle", "Bảng người dùng đã đỗ xe");
+            List<ParkingDto> parkingDto = convertParkingsToParkingDto(parkings, model);
+            model.addAttribute("parkings", parkingDto);
+        } else {
+            List<Parking> parkings = parkingService.getAllParkingsWithNotNullCheckOut();
+            model.addAttribute("pageTitle", "Bảng người dùng đã đỗ xe");
+            List<ParkingDto> parkingDto = convertParkingsToParkingDto(parkings, model);
+            model.addAttribute("parkings", parkingDto);
+        }
+        return "parkingReport";
+    }
+
 	
     // hiển thị xe của parking id
 	@GetMapping("/Parking/car/{id}")
