@@ -195,7 +195,7 @@ public class HomeController {
 	public String newPosition(Model model) {
 		model.addAttribute("position", new Position());
 		List<String> areaList = Arrays.asList("KV 1", "KV 2");
-    	List<String> conditionList = Arrays.asList("ACTIVE", "INACTIVE");
+		List<PositionCondition> conditionList = Arrays.asList(PositionCondition.values());
     	model.addAttribute("pageTitle", "Thêm chỗ đỗ xe");
 		model.addAttribute("areaList", areaList);
 		model.addAttribute("conditionList", conditionList);
@@ -294,7 +294,7 @@ public class HomeController {
         return parkingDto;
     }
     
-    // controller tìm parking
+    // controller thống kê parking
     @GetMapping("/ParkingReport")
     public String parkingReport(@RequestParam(required = false) String from, @RequestParam(required = false) String to, Model model) {
         if (from != null && to != null) {
@@ -321,13 +321,14 @@ public class HomeController {
         	Car carId = carService.getCarById(id);
             model.addAttribute("carId", carId);
             model.addAttribute("pageTitle", "Xem thông tin xe");
-            return "redirect:/carsDetail";
+            return "carsDetail";
         } catch (ConfigDataResourceNotFoundException ex) {
             // Handle exception if position is not found
-            return "redirect:/parkingReport";
+            return "parkingReport";
         } 
 	}
 	
+	// bảng thẻ tháng
 	@GetMapping("/MonthlyParkingTable")
 	public String monParkingMana(Model model) {
 		List<MonthlyTicket> monthlyTickets = monthlyTicketService.getMonthlyTicketAvailable();
