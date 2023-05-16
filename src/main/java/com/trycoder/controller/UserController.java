@@ -88,9 +88,24 @@ public class UserController {
      	return "redirect:/Users/edit/{id}";
 	}
 	
-	@GetMapping("/CarsDetail")
-	public String CarsDetail() {
-		
-		return "carsDetail";
+	@GetMapping("/DencenRole")
+	public String dencenRole(Model model) {
+		List<UserDtls> users = userRepo.findByRole("ROLE_USER");
+		List<UserDto> userDto = new ArrayList<>();
+		model.addAttribute("pageTitle", "Phân quyền");
+		for (UserDtls user : users) {
+			UserDto userModel = new UserDto();
+			userModel.setId(user.getId());
+			userModel.setFullName(user.getFullName());
+			userModel.setEmail(user.getEmail());
+			userModel.setAddress(user.getAddress());
+			userModel.setDob(user.getDob());
+			userModel.setGender(user.getGender());
+			userModel.setPhone(user.getPhone());
+			userModel.setPassword(user.getPassword());
+			userDto.add(userModel);
+	    }
+	    model.addAttribute("users", userDto);
+		return "dencenRole";
 	}
 }
