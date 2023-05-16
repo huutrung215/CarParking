@@ -41,6 +41,7 @@ import com.trycoder.model.Position;
 import com.trycoder.model.PositionCondition;
 import com.trycoder.model.PositionStatus;
 import com.trycoder.model.UserDtls;
+import com.trycoder.repository.CarRepository;
 import com.trycoder.repository.ParkingPriceRepository;
 import com.trycoder.repository.ParkingRepository;
 import com.trycoder.repository.PositionRepository;
@@ -86,6 +87,9 @@ public class HomeController {
 	
 	@Autowired
 	MonthlyTicketService monthlyTicketService;
+	
+	@Autowired
+	private CarRepository carRepo;
 	
 	// Trang index
 	@GetMapping("/")
@@ -154,7 +158,7 @@ public class HomeController {
 			parkingModel.setCheckOut(parking.getCheckOut());
 			parkingModel.setPosition(parking.getPosition());
 			parkingModel.setMonthlyTicket(parking.getMonthlyTicket());
-			parkingModel.setCar(parking.getCar());
+			parkingModel.setNumberPlates(parking.getNumberPlates());
 			parkingDto.add(parkingModel);
 		}
 		model.addAttribute("parkings", parkingDto);
@@ -216,29 +220,55 @@ public class HomeController {
 		return "positionTable";
 	}
 	
+	@GetMapping("/AddCar")
+	public String newCar(Model model) {
+		model.addAttribute("car", new Car());
+		model.addAttribute("pageTitle", "Thêm xe khách vãng lai");
+		return "addCar";
+	}
+	
+	//Thêm xe
+	 @PostMapping("/CreateCar")
+	 public String addCar(@ModelAttribute("car") Car car, BindingResult result, RedirectAttributes ra) {
+		 if (result.hasErrors()) {
+	            ra.addFlashAttribute("msgErr", "Điền đủ thông tin.");
+	            return "redirect:/AddCar";
+	     } else {
+	    	 
+	     }
+		return null;
+	 }
+	
+	
 	@GetMapping("/AddNormalParking")
 	public String newNormalParking(Model model) {
 		model.addAttribute("parking", new Parking());
 		model.addAttribute("pageTitle", "Thêm chỗ đỗ xe khách vãng lai");
+		List<Position> positionParkings = positionService.getAvailableActivePositions();
+	    positionService.getAvailableActivePositions();
+	    model.addAttribute("positions", positionParkings);
 		return "addNomalParking";
 	}
-	
+	                          
 	 @PostMapping("/CreateNormalParking")
-	 public String addNormalParking(@ModelAttribute("parking") Parking parking, BindingResult result, RedirectAttributes ra) {
+	 public String addNormalParking(@ModelAttribute("parking") Parking parking, BindingResult result, RedirectAttributes ra, Model model) {
 		 if (result.hasErrors()) {
 	            ra.addFlashAttribute("msgErr", "Điền đủ thông tin.");
 	            return "redirect:/AddNormalParking";
-	        } else {
-	        	Parking existingParking = parkingRepo.findByParkingName(parking.getParkingName());
-	        	if (existingParking != null && !existingParking.getParkingId().equals(parking.getParkingId())) {
-	        		result.rejectValue("parkingName", "duplicate", "parkingName đã tồn tại");
-	                ra.addFlashAttribute("msgErr", "Parking Name đã tồn tại");
-	                return "redirect:/AddNormalParking";
-	        	}
-	        	parkingService.createNomalParking(parking);
-	        	 ra.addFlashAttribute("msg", "Thêm chỗ đỗ thành công.");
-	             return "redirect:/AddNormalParking";
-	        }
+        } else {
+        	// Lấy position từ repository bằng id và gán cho parking
+            Position position = positionRepo.findById(parking.getPosition().getPositionId()).orElse(null);
+            if (position == null) {
+                ra.addFlashAttribute("msgErr", "Không tìm thấy vị trí đỗ xe.");
+                return "redirect:/AddNormalParking";
+            }
+            parking.setPosition(position);
+        	System.out.println(parking.getPosition());
+        	
+        	parkingService.createNomalParking(parking);
+        	 ra.addFlashAttribute("msg", "Thêm chỗ đỗ thành công.");
+             return "redirect:/AddNormalParking";
+        }
 	 }
 	
 	
@@ -357,7 +387,7 @@ public class HomeController {
             
             parkingModel.setPosition(parking.getPosition());
             parkingModel.setMonthlyTicket(parking.getMonthlyTicket());
-            parkingModel.setCar(parking.getCar());
+            parkingModel.setNumberPlates(parking.getNumberPlates());
             parkingDto.add(parkingModel);
         }
         model.addAttribute("totalPrice", totalPrice);

@@ -27,14 +27,14 @@ public class MonthlyTicketService {
 	
 	 public List<MonthlyTicket> getMonthlyTicketAvailable() {
 		 List<MonthlyTicket> monthlyTickets = getAllMonthlyTicket();
-		 List<MonthlyTicket> result = new ArrayList<>();
-		 
-		 for (MonthlyTicket monthlyTicket : monthlyTickets) {
-			 if (monthlyTicket.getEndDate().isAfter(LocalDateTime.now())) {
-				 result.add(monthlyTicket);
-			 }
-		 }
-        return result;
+			/*
+			 * List<MonthlyTicket> result = new ArrayList<>();
+			 * 
+			 * for (MonthlyTicket monthlyTicket : monthlyTickets) { if
+			 * (monthlyTicket.getEndDate().isAfter(LocalDateTime.now())) {
+			 * result.add(monthlyTicket); } }
+			 */
+        return monthlyTickets;
     }
 	 
 	 public Long calMonthlyTicketPriceFromLastMonth() {

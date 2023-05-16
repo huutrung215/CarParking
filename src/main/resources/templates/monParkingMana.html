@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th = "https://www.thymeleaf.org/">
 
 <head th:replace="fragments :: header">
 </head>
@@ -43,6 +43,7 @@
                                             <th>Ngày kết thúc</th>
                                             <th>User ID</th>
                                             <th>Họ tên</th>
+                                            <th></th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -53,6 +54,7 @@
       										<td th:text="${ticket.endDate}"></td>
       										<td th:text="${ticket.user.getId()}"></td>
       										<td th:text="${ticket.user.getFullName()}"></td>
+      										<td th:text="${ticket.endDate.isBefore(T(java.time.LocalDateTime).now()) ? 'Hết hạn' : 'Còn hạn'}">Hết hạn</td>
                                         </tr>   
                                     </tbody>
                                 </table>

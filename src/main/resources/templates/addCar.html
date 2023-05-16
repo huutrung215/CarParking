@@ -31,45 +31,45 @@
                 <div class="container-fluid">
 
                     <!-- Page Heading -->
-                    <h1 class="h3 mb-2 text-gray-800">Thêm chỗ đỗ xe khách vãng lai</h1>
+                    <h1 class="h3 mb-2 text-gray-800">Thêm xe khách vãng lai</h1>
 
                     <div class="box box-primary">
 				    <div class="box-body">
-				   <div th:if="${msg}" class="alert alert-success text-center">
-					    [[${msg}]]
-					  </div>
-					  <div th:if="${msgErr}" class="alert alert-danger text-center">
-					    [[${msgErr}]]
-					  </div>
-				        <form class="form-horizontal" action="/CreateNormalParking" th:object="${parking}" method="post" onsubmit="return validateForm()">
-				       
+				    <div th:if="${msg}" class="alert alert-success text-center">
+							    [[${msg}]]
+							  </div>
+				        <form class="form-horizontal" action="" th:object="${parking}" method="post" onsubmit="return validateForm()">
 				            <div class="form-group">
-				                <label class="control-label col-sm-2" for="">Chỗ đỗ xe:</label>
-				                <div class="col-sm-10">
-				                    <select type="text" class="form-control" id="positionName" th:field="*{position.positionId}" name="positionName">
-				                    	<option value="">--Chọn vị trí--</option>
-										  <th:block th:each="position : ${positions}">
-										    <option th:value="${position.positionId}" th:text="${position.positionName}"></option>
-										  </th:block>
-				                    </select>
-				                    <p id="positionName-error" class="text-left fs-4 text-danger"></p>
-				                </div>
-				            </div>
-				            
-				            <div class="form-group">
-				                <label class="control-label col-sm-2" for="">Biển số xe:</label>
-				                <div class="col-sm-10">
-				                    <input type="text" class="form-control" id="numberPlates" value="" th:field="*{numberPlates}" name="numberPlates">
-				                    <p id="numberPlates-error" class="text-left fs-4 text-danger"></p>
-				                </div>
-				            </div>
-				
-				            <div class="form-group">
-				                <div class="col-sm-offset-2 col-sm-10">
-				                	<button type="submit" id="huhong" class="btn btn-success">Lưu dữ liệu</button>
-				                    <a th:href = "@{/}" class="btn btn-warning">Quay lại</a>
-				                </div>
-				            </div>
+							    <label class="control-label col-sm-2" for="">Biển số xe:</label>
+							    <div class="col-sm-10">
+							        <input type="text" class="form-control" id="numberPlates" value="" th:field="*{car.numberPlates}" name="numberPlates">
+							        <p id="numberPlates-error" class="text-left fs-4 text-danger"></p>
+							    </div>
+							</div>
+							
+							<div class="form-group">
+							    <label class="control-label col-sm-2" for="">Tên xe:</label>
+							    <div class="col-sm-10">
+							        <input type="text" class="form-control" id="carName" value="" th:field="*{car.carName}" name="carName">
+							        <p id="carName-error" class="text-left fs-4 text-danger"></p>
+							    </div>
+							</div>
+							
+							<div class="form-group">
+							    <label class="control-label col-sm-2" for="">Màu sắc xe:</label>
+							    <div class="col-sm-10">
+							        <input type="text" class="form-control" id="color" value="" th:field="*{car.color}" name="color">
+							        <p id="color-error" class="text-left fs-4 text-danger"></p>
+							    </div>
+							</div>
+							
+							<div class="form-group">
+							    <label class="control-label col-sm-2" for="">Ghi chú:</label>
+							    <div class="col-sm-10">
+							        <input type="text" class="form-control" id="description" value="" th:field="*{car.description}" name="description">
+							        <p id="description-error" class="text-left fs-4 text-danger"></p>
+							    </div>
+							</div>
 				        </form>
 				    </div>
 				</div>  
@@ -124,49 +124,58 @@
    	 flatpickr(".flatpickr");
 	</script>
 	
-	<!-- <script>
+	 <script>
 		$(document).ready(function(){
 			$("form").submit(function(e){
 	        e.preventDefault();
 	    });
 		})
 		$('#huhong').on('click',()=>{
-			var parkingName = $('#parkingName').val()
+			var numberPlates = $('#numberPlates').val()
+			var carName = $('#carName').val()
+			var color = $('#color').val()
 			var description = $('#description').val()
-			 var regex = /^[A-Za-z][0-9]{2}$/
-			if (parkingName == "" || !regex.test(positionName) || description == "") {
+			if (numberPlates==""|| description == "" || carName == "" || color == "") {
 		      alert("Vui lòng nhập đầy đủ!");
 		    } else {
 		    	$("form").unbind();
 		    	$("form").submit();
 		    }
 		})
-	</script>  -->
+	</script>
 	
 	<script>
 	 function validateForm() {
 	   // Lấy giá trị các trường dữ liệu
-	   
-	   var positionName = document.getElementById("positionName").value;
-	   var positionNameEr = document.getElementById("positionName-error");
-	   var regex = /^[0-9]{2}[A-Z]-[0-9]{4,5}$/;
-
-	   
 	   var numberPlates = document.getElementById("numberPlates").value;
 	   var numberPlatesEr = document.getElementById("numberPlates-error");
 	   
-	  
-	   console.log($('#positionName').val())
-	   if ($('#positionName').val() === "") {
-		   positionNameEr.innerHTML = "PositionName chưa có!";
+	   var carName = document.getElementById("carName").value;
+	   var carNameEr = document.getElementById("carName-error");
+	   
+	   var color = document.getElementById("color").value;
+	   var colorEr = document.getElementById("colorEr-error");
+	   
+	   var description = document.getElementById("description").value;
+	   var descriptionEr = document.getElementById("description-error");
+	   
+	   // Kiểm tra số điện thoại có 10 số
+	   if (parkingName.length !== 4) {
+		   parkingNameEr.innerHTML = "ParkingName phải có 4 ký tự!";
 	     return false;
 	   }
 	   
-	   if (numberPlates.length === "" || !regex.test(numberPlates)) {
-		   numberPlatesEr.innerHTML = "Biển số xe sai định dạng!";
-	     return false;
-	   }
-	   
+	   //kiểm tra email
+		 if (positionName.length !== 3) {
+			 positionNameEr.innerHTML = "PositionName phải có 3 ký tự!";
+		     return false;
+		   }
+		 
+		 //kiểm tra họ tên
+		 if (numberPlates.length !== 10) {
+			 numberPlatesEr.innerHTML = "Biển số xe phải có 10 ký tự.";
+			 return false;
+		 }
 	 }
 	</script>
 

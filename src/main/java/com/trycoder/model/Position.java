@@ -24,14 +24,12 @@ import lombok.Data;
 
 @Data
 @Entity
-@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"positionName"}))
 public class Position {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long positionId;
 	
 	@NotBlank
-	@Pattern(regexp="^[A-Za-z]\\d{2}$")
 	private String positionName;
 
 	@NotBlank

@@ -23,7 +23,8 @@ public class Parking {
 	private LocalDateTime checkIn;
 	private LocalDateTime checkOut;
 	private Long parkingPrice;
-	
+	private String numberPlates;
+
 	@OneToOne
 	@JoinColumn(name = "car_id")
 	private Car car;
@@ -43,6 +44,7 @@ public class Parking {
 	@OneToOne
 	@JoinColumn(name = "ticket_id")
     private MonthlyTicket monthlyTicket;
+	
 	
 	public Long getParkingId() {
 		return parkingId;
@@ -107,5 +109,12 @@ public class Parking {
 	public void setMonthlyTicket(MonthlyTicket monthlyTicket) {
 		this.monthlyTicket = monthlyTicket;
 	}
-	 
+
+	public String getNumberPlates() {
+		return numberPlates;
+	}
+
+	public void setNumberPlates(String numberPlates) {
+		this.numberPlates = numberPlates;
+	}
 }

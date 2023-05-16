@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.trycoder.model.Position;
+import com.trycoder.model.PositionCondition;
 import com.trycoder.model.PositionStatus;
 import com.trycoder.repository.PositionRepository;
 
@@ -20,6 +21,12 @@ public class PositionService {
 	
 	 public List<Position> getAllPositions() {
 	        return positionRepository.findAll();
+    }
+	 
+
+    public List<Position> getAvailableActivePositions() {
+    	
+        return positionRepository.getAvailableActivePositions();
     }
 	 
 	 

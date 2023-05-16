@@ -5,5 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import com.trycoder.model.Car;
 
 public interface CarRepository extends JpaRepository<Car, Long> {
-
+	Car findByNumberPlates(String numberPlates);
+	Car findByCarId(Long carId);
 }

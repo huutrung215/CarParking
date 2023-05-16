@@ -15,7 +15,6 @@ public interface ParkingRepository extends JpaRepository<Parking, Long> {
 	
 	List<Parking> findByCheckOutIsNotNull(Sort sort);
 
-	Parking findByParkingName(String parkingName);
 	List<Parking> findByMonthlyTicketIsNull();
 
 }

@@ -41,7 +41,6 @@
                                     <thead>
                                         <tr>
                                         	<th>STT</th>
-                                        	<th>Parking Name</th>
                                             <th>Họ tên</th>
                                             <th>Số thẻ tháng</th>
                                             <th>Vị trí đỗ</th>
@@ -53,12 +52,11 @@
                                     <tbody>
                                         <tr th:each="parking, index : ${parkings}">
                                         	<td th:text="${index.count}"></td>
-                                        	<td th:text="${parking.parkingName}"></td>
 											<td th:text="${parking.monthlyTicket != null ? parking.monthlyTicket.getUser().getFullName() : ''}"></td>
                                             <td th:text="${parking.monthlyTicket != null ? parking.monthlyTicket.getTicketId() : ''}"></td>                                      
                                             <td th:text="${parking.position.getPositionName()}"></td>
-                                            <td th:text="${parking.car.getNumberPlates()}"></td>
-                                            <td th:text="${parking.checkIn}"></td>
+                                            <td th:text="${parking.getNumberPlates()}"></td>
+                                            <td th:text="${parking.getCheckIn()}"></td>
                                              <td>
 							                    <a th:href="@{/Parking/checkout/{id}(id=${parking.id})}" class="btn btn-primary">Check out</a>
 							                </td>

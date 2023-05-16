@@ -18,6 +18,7 @@ import com.trycoder.model.Parking;
 import com.trycoder.model.ParkingPrice;
 import com.trycoder.model.Position;
 import com.trycoder.model.PositionStatus;
+import com.trycoder.repository.CarRepository;
 import com.trycoder.repository.ParkingPriceRepository;
 import com.trycoder.repository.ParkingRepository;
 import com.trycoder.repository.PositionRepository;
@@ -35,6 +36,9 @@ public class ParkingService {
 	
 	@Autowired
 	private static ParkingPriceRepository parkingPriceRepo;
+	
+	@Autowired
+	private CarRepository carRepo;
     
     public ParkingService(ParkingRepository parkingRepo, ParkingPriceRepository parkingPriceRepo) {
         this.parkingPriceRepo = parkingPriceRepo;
@@ -58,25 +62,19 @@ public class ParkingService {
 	}
 	
 	public Parking createNomalParking(Parking parking) {
-		 if (StringUtils.isBlank(parking.getParkingName())) {
-		        throw new IllegalArgumentException("Parking name cannot be blank");
-		    }
+		
 		 	parking.setCheckIn(LocalDateTime.now());
 		 	
 		 	//chuyển status position
 		 	Position position = parking.getPosition();
-		 	position.setStatus(PositionStatus.OCCUPIED);
-		    parking.setPosition(position);
-		    
-		    //Tạo car mới
-		    Car car = new Car();
-		    car.setNumberPlates(parking.getCar().getNumberPlates());
-		    car.setCarName(parking.getCar().getCarName());
-		    car.setColor(parking.getCar().getColor());
-		    car.setDescription(parking.getCar().getDescription());
+		 	if (position == null) {
+		        throw new IllegalArgumentException("Position cannot be null");
+		    }
 
-		    // Set car
-		    parking.setCar(car);
+		 	position.setStatus(PositionStatus.OCCUPIED);
+		 	positionRepo.save(position);
+		 	
+		    parking.setPosition(position);
 		    
 		    Parking savedParking = parkingRepo.save(parking);
 		    if (savedParking == null) {

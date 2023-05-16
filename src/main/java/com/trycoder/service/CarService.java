@@ -20,6 +20,5 @@ public class CarService {
 	public Car getCarById(Long id) {
 		return carRepo.findById(id)
 				.orElseThrow(() -> new EntityNotFoundException("Không tìm thấy xe id " + id));
-	}
-	
+	}	
 }

@@ -17,6 +17,7 @@ public class ParkingDto {
 	private Long parkingPrice;
 	private MonthlyTicket monthlyTicket;
 	private Car car;
+	private String numberPlates;
 	
 	public ParkingDto() {}
 	
@@ -29,6 +30,7 @@ public class ParkingDto {
 		this.parkingPrice = parking.getParkingPrice();
 		this.monthlyTicket = parking.getMonthlyTicket();
 		this.car = parking.getCar();
+		this.numberPlates = parking.getNumberPlates();
 	}
 
 	public Long getId() {
@@ -94,4 +96,13 @@ public class ParkingDto {
 	public void setMonthlyTicket(MonthlyTicket monthlyTicket) {
 		this.monthlyTicket = monthlyTicket;
 	}
+
+	public String getNumberPlates() {
+		return numberPlates;
+	}
+
+	public void setNumberPlates(String numberPlates) {
+		this.numberPlates = numberPlates;
+	}
+	
 }
