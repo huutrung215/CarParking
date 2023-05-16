@@ -10,6 +10,7 @@ import java.util.Arrays;
 import org.springframework.web.server.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.config.ConfigDataResourceNotFoundException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -25,6 +26,9 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import javax.validation.constraints.NotNull;
+import javax.validation.Valid;
+
 
 import com.trycoder.dto.MonthlyTicketDto;
 import com.trycoder.dto.ParkingDto;
@@ -38,6 +42,7 @@ import com.trycoder.model.PositionCondition;
 import com.trycoder.model.PositionStatus;
 import com.trycoder.model.UserDtls;
 import com.trycoder.repository.ParkingPriceRepository;
+import com.trycoder.repository.ParkingRepository;
 import com.trycoder.repository.PositionRepository;
 import com.trycoder.repository.UserRepository;
 import com.trycoder.service.CarService;
@@ -62,10 +67,13 @@ public class HomeController {
 	PositionService positionService;
 	
 	@Autowired
-	PositionRepository positionRepository;
+	PositionRepository positionRepo;
 	
 	@Autowired
 	ParkingService parkingService;
+	
+	@Autowired
+	ParkingRepository parkingRepo;
 	
 	@Autowired
 	CarService carService;
@@ -82,7 +90,7 @@ public class HomeController {
 	// Trang index
 	@GetMapping("/")
 	public String index(Model model) {
-		long availablePositions = positionRepository.countByStatus(PositionStatus.AVAILABLE) - positionRepository.countByCondition(PositionCondition.INACTIVE);
+		long availablePositions = positionRepo.countByStatus(PositionStatus.AVAILABLE) - positionRepo.countByCondition(PositionCondition.INACTIVE);
 		model.addAttribute("availablePositions", availablePositions);
 		
 		long countNewUser = userRepo.countByRoleAndCreatedUserBetween("ROLE_USER", LocalDateTime.now().minusWeeks(1), LocalDateTime.now());
@@ -110,7 +118,22 @@ public class HomeController {
 	        positionModel.setStatus(position.getStatus());
 	        positionModel.setDescription(position.getDescription());
 	        positionModel.setCondition(position.getCondition());
-	        positionModel.setParking(position.getParking());
+	        
+	        List<Parking> parkings = parkingService.getAllParkingsWithNotNullCheckOut();
+	        List<ParkingDto> parkingDtos = new ArrayList<>();
+	        for (Parking parking : parkings) {
+	            ParkingDto parkingModel = new ParkingDto();
+	            parkingModel.setId(parking.getParkingId());
+	            parkingModel.setParkingName(parking.getParkingName());
+	            parkingModel.setCheckIn(parking.getCheckIn());
+	            parkingModel.setCheckOut(parking.getCheckOut());
+	            parkingModel.setPosition(parking.getPosition());
+	            parkingModel.setParkingPrice(parking.getParkingPrice());
+	            parkingModel.setMonthlyTicket(parking.getMonthlyTicket());
+	            parkingModel.setCar(parking.getCar());
+	            parkingDtos.add(parkingModel);
+	        }
+	        positionModel.setParkings(parkings);
 	        positionDto.add(positionModel);
 	    }
 	    model.addAttribute("positions", positionDto);
@@ -183,12 +206,41 @@ public class HomeController {
 	        positionModel.setStatus(position.getStatus());
 	        positionModel.setDescription(position.getDescription());
 	        positionModel.setCondition(position.getCondition());
-	        positionModel.setParking(position.getParking());
+	        
+	        List<Parking> parkings = parkingService.getAllParkings();
+	        positionModel.setParkings(parkings);
+	        
 	        positionDto.add(positionModel);
 	    }
 	    model.addAttribute("positions", positionDto);
 		return "positionTable";
 	}
+	
+	@GetMapping("/AddNormalParking")
+	public String newNormalParking(Model model) {
+		model.addAttribute("parking", new Parking());
+		model.addAttribute("pageTitle", "Thêm chỗ đỗ xe khách vãng lai");
+		return "addNomalParking";
+	}
+	
+	 @PostMapping("/CreateNormalParking")
+	 public String addNormalParking(@ModelAttribute("parking") Parking parking, BindingResult result, RedirectAttributes ra) {
+		 if (result.hasErrors()) {
+	            ra.addFlashAttribute("msgErr", "Điền đủ thông tin.");
+	            return "redirect:/AddNormalParking";
+	        } else {
+	        	Parking existingParking = parkingRepo.findByParkingName(parking.getParkingName());
+	        	if (existingParking != null && !existingParking.getParkingId().equals(parking.getParkingId())) {
+	        		result.rejectValue("parkingName", "duplicate", "parkingName đã tồn tại");
+	                ra.addFlashAttribute("msgErr", "Parking Name đã tồn tại");
+	                return "redirect:/AddNormalParking";
+	        	}
+	        	parkingService.createNomalParking(parking);
+	        	 ra.addFlashAttribute("msg", "Thêm chỗ đỗ thành công.");
+	             return "redirect:/AddNormalParking";
+	        }
+	 }
+	
 	
 	//Thêm chỗ đỗ xe
 	@GetMapping("/Position/add")
@@ -204,10 +256,23 @@ public class HomeController {
 	
 	// Mapping để xử lý request thêm mới position
     @PostMapping("/positions")
-    public String addPosition(@ModelAttribute("position") Position position, RedirectAttributes ra) {
-    	positionService.createPosition(position);
-    	ra.addFlashAttribute("msg", "Thêm chỗ đỗ thành công.");
-        return "redirect:/Position/add";
+    public String addPosition(@ModelAttribute("position") @NotNull @Valid Position position, BindingResult bindingResult, RedirectAttributes ra) {
+    	if (bindingResult.hasErrors()) {
+            ra.addFlashAttribute("msgErr", "Vui lòng điền đầy đủ thông tin chỗ đỗ xe.");
+            return "redirect:/Position/add";
+        } else {
+        	 // Kiểm tra trùng PositionName trong database
+            Position existingPosition = positionRepo.findByPositionName(position.getPositionName());
+            if (existingPosition != null && !existingPosition.getPositionId().equals(position.getPositionId())) {
+                bindingResult.rejectValue("positionName", "duplicate", "Tên vị trí đã tồn tại");
+                ra.addFlashAttribute("msgErr", "Tên vị trí đã tồn tại");
+                return "redirect:/Position/add";
+            }
+            
+            positionService.createPosition(position);
+            ra.addFlashAttribute("msg", "Thêm chỗ đỗ thành công.");
+            return "redirect:/Position/add";
+        }
     }
     
     
@@ -233,15 +298,20 @@ public class HomeController {
     @PostMapping("/UpdatePosition/{id}")
 	public String EditPosition(@PathVariable("id") Long id, Position newPosition,
 	        BindingResult result, RedirectAttributes ra) {
-    	if (result.hasErrors()) {
-            return "positionTable";
-        }   	
-    	 try {
-	        Position updatedPosition = positionService.updatePosition(id, newPosition);
-	        ra.addFlashAttribute("msg", "chỗ đỗ cập nhật thành công");
-	    } catch (ConfigDataResourceNotFoundException ex) {
-	    }
-    	return "redirect:/Position/edit/{id}";
+    	try {
+            if (result.hasErrors()) {
+                return "positionTable";
+            }
+            Position updatedPosition = positionService.updatePosition(id, newPosition);
+            ra.addFlashAttribute("msg", "Chỗ đỗ đã được cập nhật thành công.");
+            return "redirect:/Position/edit/{id}";
+        } catch (DataIntegrityViolationException ex) {
+            ra.addFlashAttribute("msgErr", "Không thể cập nhật vị trí vì đã tồn tại vị trí có tên tương tự.");
+            return "redirect:/Position/edit/{id}";
+        } catch (Exception ex) {
+            ra.addFlashAttribute("msgErr", "Có lỗi xảy ra khi cập nhật vị trí.");
+            return "redirect:/Position/edit/{id}";
+        }
 	}
     
     // xóa chỗ đỗ xe
@@ -252,7 +322,7 @@ public class HomeController {
             positionService.deletePosition(id);
             ra.addFlashAttribute("msg", "Xóa chỗ đỗ thành công");
         } catch (ConfigDataResourceNotFoundException ex) {
-            ra.addFlashAttribute("msg", "Xóa chỗ đỗ thất bại");
+            ra.addFlashAttribute("msgErr", "Xóa chỗ đỗ thất bại");
         }
         return "redirect:/positionTable";
 	}
@@ -440,16 +510,17 @@ public class HomeController {
 			      if (updatePassUser != null) {
 			    	  session.setAttribute("msg", "Change Password Successfully");
 			      } else {
-			    	  session.setAttribute("msg", "Change Password Failled");
+			    	  session.setAttribute("msgErr", "Change Password Failled");
 			      }
 			    } else {
 			    	System.out.println("Nhập lại mật khẩu mới bị sai");
+			    	session.setAttribute("msgErr", "Change Password Failled");
 			    }
 			System.out.println("Mật khẩu cũ đúng");
 		}
 			
 		else {
-			session.setAttribute("msg", "Old Password Incorrect");
+			session.setAttribute("msgErr", "Old Password Incorrect");
 			System.out.println("Mật khẩu cũ sai");
 		}
 			

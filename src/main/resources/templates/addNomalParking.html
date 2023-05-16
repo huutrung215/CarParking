@@ -31,59 +31,59 @@
                 <div class="container-fluid">
 
                     <!-- Page Heading -->
-                    <h1 class="h3 mb-2 text-gray-800">Sửa thông tin người dùng</h1>
+                    <h1 class="h3 mb-2 text-gray-800">Thêm chỗ đỗ xe khách vãng lai</h1>
 
                     <div class="box box-primary">
 				    <div class="box-body">
 				    <div th:if="${msg}" class="alert alert-success text-center">
 							    [[${msg}]]
 							  </div>
-				        <form class="form-horizontal" th:action="@{/UpdateUser/{id}(id=${id})}" th:object="${userId}" method="post" onsubmit="return validateForm()">
+				        <form class="form-horizontal" action="/CreateNormalParking" th:object="${parking}" method="post" onsubmit="return validateForm()">
 				            <div class="form-group">
-				                <label class="control-label col-sm-2" for="">Họ Tên:</label>
+				                <label class="control-label col-sm-2" for="">Parking Name:</label>
 				                <div class="col-sm-10">
-				                    <input type="text" class="form-control" id="fullName" th:value="${fullName}" th:field="*{fullName}" name ="fullName" autofocus>
-				                     <p id="fullName-error" class="text-left fs-4 text-danger"></p>
+				                    <input type="text" class="form-control" id="parkingName" th:value="${parking.parkingName}" th:field="*{parkingName}" name ="parkingName" autofocus>
+				                     <p id="parkingName-error" class="text-left fs-4 text-danger"></p>
 				                </div>
 				            </div>
 				            
 				            <div class="form-group">
-				                <label class="control-label col-sm-2" for="">Email:</label>
+				                <label class="control-label col-sm-2" for="">Chỗ đỗ xe:</label>
 				                <div class="col-sm-10">
-				                    <input type="email" class="form-control" id="email" th:value="email" th:field="*{email}" name="email">
-				                    <p id="email-error" class="text-left fs-4 text-danger"></p>
+				                    <input type="text" class="form-control" id="positionName" value="" th:field="*{position.positionName}" name="positionName">
+				                    <p id="positionName-error" class="text-left fs-4 text-danger"></p>
 				                </div>
 				            </div>
 				
 				            <div class="form-group">
-				                <label class="control-label col-sm-2" for="">Địa chỉ:</label>
+				                <label class="control-label col-sm-2" for="">Biển số xe:</label>
 				                <div class="col-sm-10">
-				                    <input type="text" class="form-control" id="address" th:value="address" th:field="*{address}" name="address">
-				                    <p id="address-error" class="text-left fs-4 text-danger"></p>
+				                    <input type="text" class="form-control" id="numberPlates" value="" th:field="*{car.numberPlates}" name="numberPlates">
+				                    <p id="numberPlates-error" class="text-left fs-4 text-danger"></p>
 				                </div>
 				            </div>
 				            
 				            <div class="form-group">
-				                <label class="control-label col-sm-2" for="">Ngày sinh:</label>
+				                <label class="control-label col-sm-2" for="">Tên xe:</label>
 				                <div class="col-sm-10">
-				                    <input type="text" class="form-control flatpickr" id="dob" th:value="dob" th:field="*{dob}" name="dob">
-				                    <p id="dob-error" class="text-left fs-4 text-danger"></p>
+				                    <input type="text" class="form-control" id="carName" value="" th:field="*{car.carName}" name="carName">
+				                    <p id="carName-error" class="text-left fs-4 text-danger"></p>
 				                </div>
 				            </div>
-				
+				            
 				            <div class="form-group">
-				                <label class="control-label col-sm-2" for="">Giới tính:</label>
+				                <label class="control-label col-sm-2" for="">Màu sắc xe:</label>
 				                <div class="col-sm-10">
-									<input type="radio" id="gender" th:name="gender" th:field="*{gender}" th:value="true" th:checked="${user.gender == 'true'}"/> Nam
-									<input type="radio" id="gender" th:name="gender" th:field="*{gender}" th:value="false" th:checked="${user.gender == 'false'}"/> Nữ
-				           		</div>
+				                    <input type="text" class="form-control" id="color" value="" th:field="*{car.color}" name="color">
+				                    <p id="color-error" class="text-left fs-4 text-danger"></p>
+				                </div>
 				            </div>
-				
+				            
 				            <div class="form-group">
-				                <label class="control-label col-sm-2" for="email">SĐT:</label>
+				                <label class="control-label col-sm-2" for="">Ghi chú:</label>
 				                <div class="col-sm-10">
-				                    <input type="number" class="form-control" id="phone" value="012343" th:field="*{phone}" name="phone">
-				                    <p id="phone-error" class="text-left fs-4 text-danger"></p>
+				                    <input type="text" class="form-control" id="description" value="" th:field="*{car.description}" name="description">
+				                    <p id="description-error" class="text-left fs-4 text-danger"></p>
 				                </div>
 				            </div>
 				
@@ -154,13 +154,15 @@
 	    });
 		})
 		$('#huhong').on('click',()=>{
-			var fullName = $('#fullName').val()
-			var email = $('#email').val()
-			var address = $('#address').val()
-			var dob = $('#dob').val()
-			var gender = $('#gender').val()
-			var phone = $('#phone').val()
-			if (fullName == "" || email == "" || address == "" || dob == "" || gender == "" || phone == "") {
+			var parkingName = $('#parkingName').val()
+			 var regex = /^[A-Za-z][0-9]{2}$/
+			var positionName = $('#positionName').val()
+			var numberPlates = $('#numberPlates').val()
+			var carName = $('#carName').val()
+			var color = $('#color').val()
+			var description = $('#description').val()
+			if (parkingName == "" || !regex.test(positionName) || positionName == ""||
+					numberPlates==""|| description == "" || carName == "" || color == "") {
 		      alert("Vui lòng nhập đầy đủ!");
 		    } else {
 		    	$("form").unbind();
@@ -172,52 +174,31 @@
 	<script>
 	 function validateForm() {
 	   // Lấy giá trị các trường dữ liệu
-	   var fullName = document.getElementById("fullName").value;
-	   var fullNameEr = document.getElementById("fullName-error");
-	   var address = document.getElementById("address").value;
-	   var addressEr = document.getElementById("address-error");
-	   var email = document.getElementById("email").value;
-	   var emailEr = document.getElementById("email-error");
-	   var phone = document.getElementById("phone").value;
-	   var phoneEr = document.getElementById("phone-error");
-	   var dob = document.getElementById("dob").value;
-	   var dobEr = document.getElementById("dob-error");
+	   var parkingName = document.getElementById("parkingName").value;
+	   var parkingNameEr = document.getElementById("parkingName-error");
+	   
+	   var positionName = document.getElementById("positionName").value;
+	   var positionNameEr = document.getElementById("positionName-error");
+	   var numberPlates = document.getElementById("numberPlates").value;
+	   var numberPlatesEr = document.getElementById("numberPlates-error");
 	   
 	   // Kiểm tra số điện thoại có 10 số
-	   if (phone.length !== 10) {
-		   phoneEr.innerHTML = "Số điện thoại phải có 10 số!";
-	     /* alert("Số điện thoại phải có 10 số!"); */
+	   if (parkingName.length !== 4) {
+		   parkingNameEr.innerHTML = "ParkingName phải có 4 ký tự!";
 	     return false;
 	   }
 	   
 	   //kiểm tra email
-		 if (email.indexOf('@') === -1) {
-			 emailEr.innerHTML = "Email nhập sai!";
-		    return false; // không tìm thấy ký tự '@'
-		  }
+		 if (positionName.length !== 3) {
+			 positionNameEr.innerHTML = "PositionName phải có 3 ký tự!";
+		     return false;
+		   }
 		 
 		 //kiểm tra họ tên
-		 if (fullName.length < 3) {
-			 fullNameEr.innerHTML = "Họ tên phải có ít nhất 3 ký tự.";
+		 if (numberPlates.length !== 10) {
+			 numberPlatesEr.innerHTML = "Biển số xe phải có 10 ký tự.";
 			 return false;
-		 } 
-		 
-		//kiểm tra địa chỉ
-		 if (address.length < 6) {
-			 addressEr.innerHTML = "Địa chỉ phải có ít nhất 6 ký tự.";
-			 return false;
-		 } 
-	   
-	   // Kiểm tra năm sinh cách đây 18 năm
-	   var today = new Date();
-	   var minDate = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate());
-	   var dobDate = new Date(dob);
-	   if (dobDate > minDate) {
-	     dobEr.innerHTML = "Ngày sinh phải cách đây ít nhất 18 năm!";
-	     return false;
-	   }
-	   // Nếu tất cả điều kiện đều đúng, cho phép gửi biểu mẫu
-	   return true;
+		 }
 	 }
 	</script>
 

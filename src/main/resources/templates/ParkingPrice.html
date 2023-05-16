@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th = "https://www.thymeleaf.org/">
 
 <head th:replace="fragments :: header">
 <title>[[${pageTitle}]]</title>
 </head>
 
 <body id="page-top">
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js" integrity="sha512-3gJwYpMe3QewGELv8k/BX9vcqhryRdzRMxVfq6ngyWXwo03GFEzjsUm8Q7RZcHPHksttq7/GFoxjCVUjkjvPdw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
@@ -24,7 +24,7 @@
             <div id="content">
 
                 <!-- Topbar -->
-              <nav th:replace="fragments :: topbar"></nav>
+             <nav th:replace="fragments :: topbar"></nav>
               <!-- End of Topbar -->
 
                 <!-- Begin Page Content -->
@@ -55,7 +55,7 @@
 				            </div>	
 				            
 				            <div class="form-group">
-				                <label class="control-label col-sm-2" for="">Phí qua đêm:</label>
+				                <label class="control-label col-sm-2" for="">Gía thẻ tháng:</label>
 				                <div class="col-sm-10">
 				                    <input type="number" class="form-control" id="priceMonth" th:value="priceMonth" th:field="*{priceMonth}" name="priceMonth">
 				                </div>
@@ -63,7 +63,7 @@
 				            	
 				            <div class="form-group">
 				                <div class="col-sm-offset-2 col-sm-10">
-				                	<button type="submit" class="btn btn-success">Lưu dữ liệu</button>
+				                	<button id="huhong" class="btn btn-success">Lưu dữ liệu</button>
 				                    <a th:href = "@{/}" class="btn btn-warning">Quay lại</a>
 				                </div>
 				            </div>
@@ -94,9 +94,8 @@
     <!-- End of Page Wrapper -->
 
     <!-- Scroll to Top Button-->
-    <a class="scroll-to-top rounded" href="#page-top">
-        <i class="fas fa-angle-up"></i>
-    </a>
+      <a th:replace="fragments :: scroll">
+	</a>
 
     <!-- Logout Modal-->
     <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-aledby="exampleModala"
@@ -112,33 +111,43 @@
                 <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
                 <div class="modal-footer">
                     <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-                    <a class="btn btn-primary" href="login.html">Logout</a>
+                    <a class="btn btn-primary" href="/logout">Logout</a>
                 </div>
             </div>
         </div>
     </div>
     
     <script>
+		$(document).ready(function(){
+			$("form").submit(function(e){
+	        e.preventDefault();
+	    });
+		})
+		$('#huhong').on('click',()=>{
+			var priceDay = $('#priceDay').val()
+			var priceNight = $('#priceNight').val()
+			var priceMonth = $('#priceMonth').val()
+			if (priceDay == "" || priceNight == "" || priceMonth == "") {
+		      alert("Vui lòng nhập đầy đủ!");
+		    } else {
+		    	$("form").unbind();
+		    	$("form").submit();
+		    }
+		})
+	</script>
+    
+    <script>
    	 flatpickr(".flatpickr");
 	</script>
-
-    <!-- Bootstrap core JavaScript-->
+	  <!-- Bootstrap core JavaScript-->
     <script src="vendor/jquery/jquery.min.js"></script>
     <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 
     <!-- Core plugin JavaScript-->
     <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
-
-    <!-- Custom scripts name all pages-->
+	
+	<!-- Custom scripts name all pages-->
     <script src="js/sb-admin-2.min.js"></script>
-
-    <!-- Page level plugins -->
-    <script src="vendor/datatables/jquery.dataTables.min.js"></script>
-    <script src="vendor/datatables/dataTables.bootstrap4.min.js"></script>
-
-    <!-- Page level custom scripts -->
-    <script src="js/demo/datatables-demo.js"></script>
-
 </body>
 
 </html>

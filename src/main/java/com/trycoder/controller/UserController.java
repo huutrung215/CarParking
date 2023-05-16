@@ -51,6 +51,7 @@ public class UserController {
 			userModel.setDob(user.getDob());
 			userModel.setGender(user.getGender());
 			userModel.setPhone(user.getPhone());
+			userModel.setCreatedUser(user.getCreatedUser());
 			userModel.setPassword(user.getPassword());
 			userDto.add(userModel);
 	    }

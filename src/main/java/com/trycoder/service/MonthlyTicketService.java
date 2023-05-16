@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.trycoder.model.MonthlyTicket;
@@ -21,7 +22,7 @@ public class MonthlyTicketService {
 	}
 	
 	public List<MonthlyTicket> getAllMonthlyTicket() {
-		return monthlyTicketRepo.findAll();
+		return monthlyTicketRepo.findAll(Sort.by(Sort.Direction.DESC, "ticketId"));
 	}
 	
 	 public List<MonthlyTicket> getMonthlyTicketAvailable() {

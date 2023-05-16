@@ -12,6 +12,9 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 
 @Data
@@ -20,8 +23,17 @@ public class UserDtls {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
+	
+	@NotBlank
+	@NotNull
 	private String fullName;
+	
+	@NotBlank
+	@NotNull
 	private String email;
+	
+	@NotBlank
+	@NotNull
 	private String address;
 	private LocalDate dob;
 	private Boolean gender;

@@ -26,7 +26,7 @@ public class UserDto {
 		this.gender = userDto.getGender();
 		this.phone = userDto.getPhone();
 		this.password = userDto.getPassword();
-		this.createdUser = userDto.createdUser;
+		this.createdUser = userDto.getCreatedUser();
 		this.role = userDto.getRole();
 		
 	}

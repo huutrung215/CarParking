@@ -25,10 +25,10 @@
                                         <h1 class="h4 text-gray-900 mb-4">Welcome Back!</h1>
                                     </div>
                                    <div th:if="${param.error}" class="alert alert-danger">
-							Invalid username & Password</div>
+									Invalid username & Password</div>
 
-						<div th:if="${param.logout}" class="alert alert-success">
-							Logout Sucessfully</div>
+									<div th:if="${param.logout}" class="alert alert-success">
+										Logout Sucessfully</div>
                                     <form class="user" action="/login" method="post">
                                         <div class="form-group">
                                             <input type="email" name="username" class="form-control form-control-user"

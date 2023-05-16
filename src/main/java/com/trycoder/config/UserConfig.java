@@ -32,14 +32,15 @@ public class UserConfig implements WebSecurityConfigurer {
 	    return new UserDetailsServiceImpl(userRepo);
 	}
 	 
-
+	// là một đối tượng encoder trong Spring Security được sử dụng để mã hóa mật khẩu người dùng trong quá trình xác thực
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
-    }
+    } //mã hóa mật khẩu giúp bảo mật mật khẩu người dùng trong quá trình truyền tải và lưu trữ chúng
     
+    //xác thực tài khoản người dùng bằng cách so sánh thông tin đăng nhập với thông tin trong cơ sở dữ liệu
     @Bean
-	public DaoAuthenticationProvider getDaoAuthProvider() {
+	public DaoAuthenticationProvider getDaoAuthProvider(){//tạo ra một đối tượng DaoAuthenticationProvider và cấu hình cho nó các thuộc tính cần thiết
 		DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider();
 		daoAuthenticationProvider.setUserDetailsService(getUserDetailsService());
 		daoAuthenticationProvider.setPasswordEncoder(passwordEncoder());

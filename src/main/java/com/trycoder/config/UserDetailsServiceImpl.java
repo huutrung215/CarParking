@@ -19,12 +19,14 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         this.userRepo = userRepo;
     }
 	
+	//sử dụng để tìm kiếm một người dùng trong cơ sở dữ liệu theo tên người dùng 
+	//(trong trường hợp này là địa chỉ email) và trả về một đối tượng UserDetails để sử dụng cho xác thực
 	@Override
 	public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
 		UserDtls user = userRepo.findByEmail(email);
 
 		if (user != null) {
-			return new CustomUserDetails(user);
+			return new CustomUserDetails(user); //người dùng được tìm thấy
 		}
 
 		throw new UsernameNotFoundException("user not available");

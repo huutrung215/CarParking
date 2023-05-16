@@ -8,6 +8,7 @@
 		margin-left: 6%;
 	}
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js" integrity="sha512-3gJwYpMe3QewGELv8k/BX9vcqhryRdzRMxVfq6ngyWXwo03GFEzjsUm8Q7RZcHPHksttq7/GFoxjCVUjkjvPdw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <head th:replace = "fragments::header">
 <title>[[${pageTitle}]]</title>
 </head>
@@ -39,11 +40,14 @@
 			            	 <div th:if="${msg}" class="alert alert-success text-center">
 							    [[${msg}]]
 							  </div>
+							  <div th:if="${msgErr}" class="alert alert-danger text-center">
+							    [[${msgErr}]]
+							  </div>
 			            	<form class="form-horizontal" action="/positions" th:object="${position}" method="post">
 							    <div class="form-group">
 							        <label class="control-label col-sm-2" for="">Số vị trí:</label>
 							        <div class="col-sm-10">
-							            <input type="text" value="position.positionName" class="form-control" id="positionName" name="positionName" th:field="*{positionName}" autofocus>
+							            <input type="text" value="position.positionName"  class="form-control" id="positionName" name="positionName" th:field="*{positionName}" autofocus>
 							        </div>
 							    </div>
 							
@@ -72,7 +76,7 @@
 							    </div>
 							    <div class="form-group">
 							        <div class="col-sm-offset-2 col-sm-10">
-							            <button type="submit" class="btn btn-success">Lưu dữ liệu</button>
+							            <button id="huhong" class="btn btn-success">Lưu dữ liệu</button>
 							            <a th:href="@{/}" class="btn btn-warning">Quay lại</a>
 							        </div>
 							    </div>
@@ -100,18 +104,54 @@
     <!-- Scroll to Top Button-->
     <a th:replace = "fragments :: scroll">
     </a>
-
-    <!--&lt;!&ndash; Logout Modal&ndash;&gt;
-    <div th:replace = "fragments :: logoutModal"></div>-->
-
+	
+   <!--  Logout Modal -->
+   <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-aledby="exampleModala"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModala">Ready to Leave?</h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-a="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                    <a class="btn btn-primary" href="/logout">Logout</a>
+                </div>
+            </div>
+        </div>
+    </div>
+	
     <div th:replace = "fragments::script"></div>
+    
+    <script>
+		$(document).ready(function(){
+			$("form").submit(function(e){
+	        e.preventDefault();
+	    });
+		})
+		$('#huhong').on('click',()=>{
+			var positionName = $('#positionName').val()
+			var description = $('#description').val()
+			var condition = $('#condition').val()
+			var regex = /^[A-Za-z][0-9]{2}$/
+			if (positionName == "" || !regex.test(positionName) || description == "" || condition == "") {
+		      alert("Vui lòng nhập đầy đủ!");
+		    } else {
+		    	$("form").unbind();
+		    	$("form").submit();
+		    }
+		})
+	</script>
     <!-- Page level plugins -->
     <script th:src="@{/vendor/chart.js/Chart.min.js}"></script>
-
+	
     <!-- Page level custom scripts -->
     <script th:src="@{/js/demo/chart-area-demo.js}"></script>
     <script th:src="@{/js/demo/chart-pie-demo.js}"></script>
-
 </body>
 
 </html>

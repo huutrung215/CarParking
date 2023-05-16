@@ -12,17 +12,21 @@ public class PositionDto {
     private String positionName;
     private PositionStatus status;
     private String description;
-    private Parking parking;
+    private List<Parking> parkings;
     private PositionCondition condition;
 
     public PositionDto() {}
 
     public PositionDto(Position position) {
-        this.id = position.getPositionId();
+    	this.id = position.getPositionId();
         this.positionName = position.getPositionName();
         this.status = position.getStatus();
         this.description = position.getDescription();
-        this.parking = position.getParking();
+        this.condition = position.getCondition();
+        this.parkings = new ArrayList<>();
+        for(Parking parking: position.getParkings()) {
+            this.parkings.add(parking);
+        }
     }
 
 	public Long getId() {
@@ -57,12 +61,14 @@ public class PositionDto {
 		this.description = description;
 	}
 
-	public Parking getParking() {
-		return parking;
+	
+	
+	public List<Parking> getParkings() {
+		return parkings;
 	}
 
-	public void setParking(Parking parking) {
-		this.parking = parking;
+	public void setParkings(List<Parking> parkingDtos) {
+		this.parkings = parkingDtos;
 	}
 
 	public PositionCondition getCondition() {

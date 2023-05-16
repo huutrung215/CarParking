@@ -10,8 +10,10 @@ import java.util.ArrayList;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import com.trycoder.model.Car;
 import com.trycoder.model.Parking;
 import com.trycoder.model.ParkingPrice;
 import com.trycoder.model.Position;
@@ -20,6 +22,9 @@ import com.trycoder.repository.ParkingPriceRepository;
 import com.trycoder.repository.ParkingRepository;
 import com.trycoder.repository.PositionRepository;
 
+import io.micrometer.common.util.StringUtils;
+
+import org.springframework.data.domain.Sort;
 import jakarta.persistence.EntityNotFoundException;
 
 @Service
@@ -51,6 +56,35 @@ public class ParkingService {
 	    ParkingPrice parkingPrice = parkingPriceRepo.findById(id).orElseThrow(() -> new EntityNotFoundException("Không tìm thấy id: " + id));
 	    return parkingPrice.getPriceNight();
 	}
+	
+	public Parking createNomalParking(Parking parking) {
+		 if (StringUtils.isBlank(parking.getParkingName())) {
+		        throw new IllegalArgumentException("Parking name cannot be blank");
+		    }
+		 	parking.setCheckIn(LocalDateTime.now());
+		 	
+		 	//chuyển status position
+		 	Position position = parking.getPosition();
+		 	position.setStatus(PositionStatus.OCCUPIED);
+		    parking.setPosition(position);
+		    
+		    //Tạo car mới
+		    Car car = new Car();
+		    car.setNumberPlates(parking.getCar().getNumberPlates());
+		    car.setCarName(parking.getCar().getCarName());
+		    car.setColor(parking.getCar().getColor());
+		    car.setDescription(parking.getCar().getDescription());
+
+		    // Set car
+		    parking.setCar(car);
+		    
+		    Parking savedParking = parkingRepo.save(parking);
+		    if (savedParking == null) {
+		        throw new RuntimeException("Failed to save parking");
+		    }
+		    
+		    return savedParking;
+	 } 
 	
 
 	public static Long calculateParkingPrice(LocalDateTime checkIn, LocalDateTime checkOut) {
@@ -125,7 +159,7 @@ public class ParkingService {
 	}
 	 
 	 public List<Parking> getAllParkingsWithNotNullCheckOut() {
-		return parkingRepo.findByCheckOutIsNotNull();	 
+		return parkingRepo.findByCheckOutIsNotNull(Sort.by(Sort.Direction.DESC, "parkingId"));	 
 	 }
 	 
 	 public Long calParkingPriceNotMonTickDay() {

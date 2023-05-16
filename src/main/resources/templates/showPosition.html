@@ -150,16 +150,16 @@ a[data-status="INACTIVE"]:hover {
             		<form action="book-seat" method="post">
 					<div class="container seat-section">
 					<div class="symbol">
-						<i class="fas fa-square one"></i>&nbsp;<span>Already Booked</span>&nbsp;&nbsp;&nbsp;&nbsp;
-						<i class="fas fa-square two"></i>&nbsp;<span>Position Available</span>&nbsp;&nbsp;&nbsp;&nbsp;
-						<i class="fas fa-square three"></i>&nbsp;<span>Confirmation</span>&nbsp;&nbsp;&nbsp;&nbsp;
+						<i class="fas fa-square one"></i>&nbsp;<span>Parking</span>&nbsp;&nbsp;&nbsp;&nbsp;
+						<i class="fas fa-square two"></i>&nbsp;<span>Available</span>&nbsp;&nbsp;&nbsp;&nbsp;
+						<i class="fas fa-square three"></i>&nbsp;<span>Booked</span>&nbsp;&nbsp;&nbsp;&nbsp;
 						<i class="fas fa-square four"></i>&nbsp;<span>Inactive</span>
 					</div>
 						<div class="row seat-row">
 						   <div class="col-6 first">
 						   	<h6>Khu vực 1</h6> 
 						   	<div class="area">
-						   		<div th:each="position, iterStat : ${positions}" th:if="${iterStat.index} &lt; ${#lists.size(positions)/2}">
+						   		<div th:each="position : ${positions}" th:if="${position.description == 'KV 1'}">
 					   				<a class="btn btn-success" 
 					   				name="positionIds" th:value="${position.id}"  th:data-condition="${position.condition}" th:data-status="${position.status}">
 									    <span th:text="${position.positionName}"></span>
@@ -170,7 +170,7 @@ a[data-status="INACTIVE"]:hover {
 						    <div class="col-6 second">
 						    <h6>Khu vực 2</h6>   
 						    	<div class="area">
-						    		<div th:each="position, iterStat : ${positions}" th:if="${iterStat.index} &gt;= ${#lists.size(positions)/2}">
+						    		<div th:each="position : ${positions}" th:if="${position.description == 'KV 2'}">
 						    			<a class="btn btn-success" name="positionIds" th:value="${position.id}" th:data-condition="${position.condition}" th:data-status="${position.status}">
 										    <span th:text="${position.positionName}"></span>
 										</a>
