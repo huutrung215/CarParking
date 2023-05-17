@@ -108,4 +108,16 @@ public class UserController {
 	    model.addAttribute("users", userDto);
 		return "dencenRole";
 	}
+	
+	@PostMapping("/CendenRole/promoteAdmin/{userId}")
+    public String promoteUserToAdmin(@PathVariable Long userId) {
+        userService.promoteUserToAdmin(userId);
+        return "redirect:/";
+    }
+	
+	@PostMapping("/CendenRole/promoteStaff/{userId}")
+    public String promoteUserToStaff(@PathVariable Long userId) {
+        userService.promoteUserToStaff(userId);
+        return "redirect:/";
+    }
 }

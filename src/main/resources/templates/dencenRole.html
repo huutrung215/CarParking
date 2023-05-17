@@ -50,10 +50,10 @@
       										<td th:text="${user.fullName}"></td>
       										<td th:text="${user.email}"></td>
       										<td>
-      											<a th:href="@{/}" class="btn btn-warning">Admin</a>
+      											<a th:href="@{'/CendenRole/promoteAdmin/'+${user.id}}" class="btn btn-primary">Admin</a>
       										</td>
       										<td>
-      										    <a th:href="@{/}" class="btn btn-danger">Nhân viên</a>
+      										    <a th:href="@{'/CendenRole/promoteStaff/'+${user.id}}" class="btn btn-primary">Nhân viên</a>
       										</td>
                                         </tr>   
                                     </tbody>

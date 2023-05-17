@@ -10,4 +10,8 @@ public interface UserService {
 	 public UserDtls getUserById(Long id);
 	 
 	 public UserDtls updateUserDtls(Long id, UserDtls newUser);
+
+	void promoteUserToAdmin(Long userId);
+
+	void promoteUserToStaff(Long userId);
 }

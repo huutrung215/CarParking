@@ -13,6 +13,7 @@ import com.trycoder.model.UserDtls;
 import com.trycoder.repository.UserRepository;
 
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -55,6 +56,24 @@ public class UserServiceImpl implements UserService {
 		user.setPhone(newUser.getPhone());
 		user.setCreatedUser(newUser.getCreatedUser());
 	    return userRepo.save(user);
- } 
+	} 
+	
+	@Override
+	@Transactional
+    public void promoteUserToAdmin(Long userId) {
+		UserDtls user = userRepo.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid user Id: " + userId));
+        user.setRole("ROLE_ADMIN");
+        userRepo.save(user);
+    }
+	
+	@Override
+	@Transactional
+    public void promoteUserToStaff(Long userId) {
+		UserDtls user = userRepo.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid user Id: " + userId));
+        user.setRole("ROLE_STAFF");
+        userRepo.save(user);
+    }
 	
 }
