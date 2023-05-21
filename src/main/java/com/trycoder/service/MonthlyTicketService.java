@@ -1,6 +1,8 @@
 package com.trycoder.service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,12 +12,17 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.trycoder.model.MonthlyTicket;
+import com.trycoder.model.ParkingPrice;
 import com.trycoder.repository.MonthlyTicketRepository;
+import com.trycoder.repository.ParkingPriceRepository;
 
 @Service
 public class MonthlyTicketService {
 	@Autowired
 	MonthlyTicketRepository monthlyTicketRepo;
+	
+	@Autowired
+	ParkingPriceService parkingPrices;
 	
 	public MonthlyTicketService(MonthlyTicketRepository monthlyTicketRepo) {
 		this.monthlyTicketRepo = monthlyTicketRepo;
@@ -39,15 +46,14 @@ public class MonthlyTicketService {
 	 
 	 public Long calMonthlyTicketPriceFromLastMonth() {
 	    LocalDateTime currentTime = LocalDateTime.now();
-	    YearMonth lastMonth = YearMonth.from(currentTime.minusMonths(1));
-	    LocalDateTime firstDayOfMonth = lastMonth.atDay(1).atStartOfDay();
-	    LocalDateTime lastDayOfMonth = lastMonth.atEndOfMonth().atTime(23, 59, 59);
+	    LocalDateTime startOfMonth = currentTime.withDayOfMonth(1).with(LocalTime.MIN);
 	    List<MonthlyTicket> tickets = monthlyTicketRepo.findByEndDateIsNotNull();
+	    ParkingPrice parkingPrice = parkingPrices.getParkingPriceById(1);
 	    Long revenue = 0L;
 	    for (MonthlyTicket ticket : tickets) {
-	    	if (ticket.getEndDate() != null && ticket.getEndDate().isAfter(firstDayOfMonth) 
-	    			&& ticket.getEndDate().isBefore(lastDayOfMonth))
-	    	revenue += ticket.getPrice();
+	    	if (ticket.getEndDate() != null && ticket.getEndDate().isAfter(startOfMonth) 
+	    			&& ticket.getEndDate().isBefore(currentTime))
+	    	revenue += parkingPrice.getPriceMonth();
 	    }
 	    return revenue;
 	  }  

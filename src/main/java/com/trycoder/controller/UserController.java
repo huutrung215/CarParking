@@ -109,15 +109,15 @@ public class UserController {
 		return "dencenRole";
 	}
 	
-	@PostMapping("/CendenRole/promoteAdmin/{userId}")
-    public String promoteUserToAdmin(@PathVariable Long userId) {
+	@PostMapping("/CendenRole/promoteAdmin/{id}")
+    public String promoteUserToAdmin(@PathVariable("id") Long userId) {
         userService.promoteUserToAdmin(userId);
-        return "redirect:/";
+        return "index";
     }
 	
-	@PostMapping("/CendenRole/promoteStaff/{userId}")
-    public String promoteUserToStaff(@PathVariable Long userId) {
+	@PostMapping("/CendenRole/promoteStaff/{id}")
+    public String promoteUserToStaff(@PathVariable("id") Long userId) {
         userService.promoteUserToStaff(userId);
-        return "redirect:/";
+        return "index";
     }
 }

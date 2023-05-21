@@ -100,11 +100,16 @@ public class HomeController {
 		long countNewUser = userRepo.countByRoleAndCreatedUserBetween("ROLE_USER", LocalDateTime.now().minusWeeks(1), LocalDateTime.now());
 		model.addAttribute("countNewUser", countNewUser);
 		
-		long totalLastMonth = parkingService.calParkingPriceNotMonTickLastMonth() + monthlyTicketService.calMonthlyTicketPriceFromLastMonth();
-		model.addAttribute("totalLastMonth", totalLastMonth);
+		
+		  long totalLastMonth = parkingService.calParkingPriceNotMonTickLastMonth() +
+				  				monthlyTicketService.calMonthlyTicketPriceFromLastMonth();
+		  model.addAttribute("totalLastMonth", totalLastMonth);
+		 
 		
 		long totalOfDay = parkingService.calParkingPriceNotMonTickDay();
+		List<Parking> parkings = parkingRepo.findByMonthlyTicketIsNull();
 		model.addAttribute("totalOfDay", totalOfDay);
+		System.out.println(parkings);
 		
 		return "index";
 	}

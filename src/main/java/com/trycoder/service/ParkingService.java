@@ -1,5 +1,6 @@
 package com.trycoder.service;
 
+import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -141,6 +142,7 @@ public class ParkingService {
 	    parking.setCheckOut(LocalDateTime.now());
 	    Position position = parking.getPosition();
 	    position.setStatus(PositionStatus.AVAILABLE);
+	    parking.setParkingPrice(calculateParkingPrice(parking.getCheckIn(), parking.getCheckOut()));
 	    positionRepo.save(position);
 	    parkingRepo.save(parking);
 	}
@@ -168,7 +170,7 @@ public class ParkingService {
 
 	    for (Parking parking : parkings) {
 	        if (parking.getCheckOut() != null && 
-	        	parking.getCheckOut().isAfter(startOfDay) && parking.getCheckOut().isAfter(now)) {
+	        	parking.getCheckOut().isAfter(startOfDay) && parking.getCheckOut().isBefore(now)) {
 	            totalPrice += parking.getParkingPrice();
 	        }
 	    }
@@ -177,14 +179,12 @@ public class ParkingService {
 	 
 	 public Long calParkingPriceNotMonTickLastMonth() {
 		 LocalDateTime currentTime = LocalDateTime.now();
-	    YearMonth lastMonth = YearMonth.from(currentTime.minusMonths(1));
-	    LocalDateTime firstDayOfMonth = lastMonth.atDay(1).atStartOfDay();
-	    LocalDateTime lastDayOfMonth = lastMonth.atEndOfMonth().atTime(23, 59, 59);
+		 LocalDateTime startOfMonth = currentTime.withDayOfMonth(1).with(LocalTime.MIN);
 	    List<Parking> parkings = parkingRepo.findByMonthlyTicketIsNull();
 	    Long totalPrice = 0L;
 	    for (Parking parking : parkings) {
-	    	if (parking.getCheckOut() != null && parking.getCheckOut().isAfter(firstDayOfMonth) 
-	    			&& parking.getCheckOut().isBefore(lastDayOfMonth)) {
+	    	if (parking.getCheckOut() != null && parking.getCheckOut().isAfter(startOfMonth) 
+	    			&& parking.getCheckOut().isBefore(currentTime)) {
 	    		totalPrice += parking.getParkingPrice();
 	    	}
 	    }
